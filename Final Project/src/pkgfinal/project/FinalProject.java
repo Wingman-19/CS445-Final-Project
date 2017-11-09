@@ -1,8 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+* File: FinalProject.java 
+* Group: The RenderMen
+* Members:
+*       * Marc Deaso
+*       * Omar Rodriguez
+*       * Nick Spencer
+*       * Luke Walsh
+*       * Alex Winger
+* Class: CS 445: – Computer Graphics 
+* 
+* Assignment: Final Project 
+* Date Last Modified: 11/8/2017 
+* 
+* Purpose: Creates the display and calls the camera's gameLoop method
+* 
+*******************************************************************************/ 
 package pkgfinal.project;
 
 import org.lwjgl.input.Keyboard;
@@ -11,54 +23,64 @@ import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.util.glu.GLU;
 
-/**
- *
- * @author awing_000
- */
 public class FinalProject
 {
+    //Camera object used to call the gameLoop method
     private FPCameraController fp = new FPCameraController(0.0f, 0.0f, 0.0f);
-    private DisplayMode displayMode;
+    private DisplayMode displayMode;    //The display mode for the game
     
+    //Method: main
+    //Purpose: This is the main method of the program. It creates a new instance
+    //         of the FinalProject class and starts it
     public static void main(String[] args)
     {
         FinalProject finalProject = new FinalProject();
         finalProject.start();
     }
     
+    //Method: start
+    //Purpose: This method creates the window, initializes it and calls the 
+    //         gameLoop method
     private void start()
     {
         try
         {
-            createWindow();
-            initGL();
-            fp.gameLoop();
+            createWindow(); //Create the window
+            initGL();   //Initialize the window
+            fp.gameLoop();  //Call the gameLoop method
         }catch(Exception e)
         {
             e.printStackTrace();
         }
     }
     
+    //Method: createWindow
+    //Purpose: This method creates the window with the appropriate display mode
     private void createWindow() throws Exception
     {
-        Display.setFullscreen(false);
+        Display.setFullscreen(false);   //The window isn't full screen
+        //Get all available display modes
         DisplayMode d[] = Display.getAvailableDisplayModes();
+        //Move through the array until we find a display mode that works
         for(int i = 0; i < d.length; i++)
         {
             if(d[i].getWidth() == 640 && d[i].getHeight() == 480 && d[i].getBitsPerPixel() == 32)
             {
                 displayMode = d[i];
-                break;
+                break;  //Break out of the loop when we find the display mode
             }
         }
-        Display.setDisplayMode(displayMode);
-        Display.setTitle("FPTesting");
-        Display.create();
+        Display.setDisplayMode(displayMode);    //Set the display mode
+        Display.setTitle("Final Project");  //Set the title
+        Display.create();   //Create the display
     }
     
+    //Method: initGL
+    //Puprose: This method initializes the window with the background and the
+    //         origin of the coordinate system
     private void initGL()
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //Black background
         
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -67,6 +89,6 @@ public class FinalProject
         
         glMatrixMode(GL_MODELVIEW);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_TEST);    //Hide the hidden faces of objects
     }
 }
