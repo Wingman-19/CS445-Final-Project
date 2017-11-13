@@ -26,7 +26,7 @@ import org.lwjgl.util.glu.GLU;
 public class FinalProject
 {
     //Camera object used to call the gameLoop method
-    private FPCameraController fp = new FPCameraController(0.0f, 0.0f, 0.0f);
+    private FPCameraController fp;
     private DisplayMode displayMode;    //The display mode for the game
     
     //Method: main
@@ -45,6 +45,7 @@ public class FinalProject
     {
         try
         {
+            fp = new FPCameraController(0.0f, 0.0f, 0.0f);
             createWindow(); //Create the window
             initGL();   //Initialize the window
             fp.gameLoop();  //Call the gameLoop method
@@ -80,6 +81,9 @@ public class FinalProject
     //         origin of the coordinate system
     private void initGL()
     {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnable(GL_DEPTH_TEST);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //Black background
         
         glMatrixMode(GL_PROJECTION);
