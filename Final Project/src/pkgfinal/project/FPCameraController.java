@@ -146,6 +146,8 @@ public class FPCameraController
     {
         //Our camera
         FPCameraController camera = new FPCameraController(0, 0, 0);
+        //I randomly chose this to be 0, 0, 0 because I didn't know what else to make it
+        Chunk chunk = new Chunk(0, 0, 0);
         float dx = 0.0f;    //Change in the x direction
         float dy = 0.0f;    //Change in the y direction
         float dt = 0.0f;    //Change in the time
@@ -188,7 +190,7 @@ public class FPCameraController
             glLoadIdentity();
             camera.lookThrough();   //Performs the transformations
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-            render();   //Draws the scene (A cube for now)
+            chunk.render();   //Draws the scene (A cube for now)
             Display.update();
             Display.sync(60);
         }
@@ -198,7 +200,7 @@ public class FPCameraController
     //Method: render
     //Purpose: This method is meant to draw the scene which happens to be a 2x2x2
     //         cude with different color sides right now
-    private void render()
+    /*private void render()
     {
         try
         {
@@ -287,5 +289,5 @@ public class FPCameraController
             glEnd();
         }catch(Exception e)
         {}
-    }
+    }*/
 }
