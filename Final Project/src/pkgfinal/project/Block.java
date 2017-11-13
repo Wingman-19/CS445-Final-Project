@@ -1,20 +1,29 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+* File: Vertex3Float.java 
+* Group: The RenderMen
+* Members:
+*       * Marc Deaso
+*       * Omar Rodriguez
+*       * Nick Spencer
+*       * Luke Walsh
+*       * Alex Winger
+* Class: CS 445: – Computer Graphics 
+* 
+* Assignment: Final Project 
+* Date Last Modified: 11/12/2017
+* 
+* Purpose: Used to specify one of six types of materials and create a block of it
+* 
+*******************************************************************************/ 
 package pkgfinal.project;
 
-/**
- *
- * @author Luke Walsh
- */
 public class Block {
     private boolean isActive;
     private BlockType Type;
     private float x,y,z;
     
     public enum BlockType {
+        //thee six different types of blocks we can create
         BlockType_Grass(0),
         BlockType_Sand(1),
         BlockType_Water(2),
@@ -37,10 +46,12 @@ public class Block {
         }
     }
     
+    //constructor for the block that takes in what type of block it is
     public Block(BlockType type) {
         Type = type;
     }
     
+    //sets the location of the block
     public void setCoords(float x, float y, float z) {
         this.x = x;
         this.y = y;

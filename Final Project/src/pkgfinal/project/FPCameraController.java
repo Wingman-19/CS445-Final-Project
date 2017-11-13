@@ -10,7 +10,7 @@
 * Class: CS 445: – Computer Graphics 
 * 
 * Assignment: Final Project 
-* Date Last Modified: 11/8/2017 
+* Date Last Modified: 11/12/2017 
 * 
 * Purpose: This class will be used to control the camera in a first-person view.
 *          It has methods to move the player around the screen, as well as

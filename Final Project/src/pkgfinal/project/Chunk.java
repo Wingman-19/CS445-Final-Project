@@ -1,8 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+* File: Chunk.java 
+* Group: The RenderMen
+* Members:
+*       * Marc Deaso
+*       * Omar Rodriguez
+*       * Nick Spencer
+*       * Luke Walsh
+*       * Alex Winger
+* Class: CS 445: – Computer Graphics 
+* 
+* Assignment: Final Project 
+* Date Last Modified: 11/12/2017
+* 
+* Purpose: Allows for fewer render calls while creating more blocks when called 
+* 
+*******************************************************************************/ 
 package pkgfinal.project;
 
 import java.nio.FloatBuffer;
@@ -14,7 +26,9 @@ import static org.lwjgl.opengl.GL15.*;
 
 public class Chunk {
     
+    //Constant to determine the size of the chunks
     static final int CHUNK_SIZE = 30;
+    //Constant for the size of the cube
     static final int CUBE_LENGTH = 2;
     private Block[][][] Blocks;
     private int VBOVertexHandle;
