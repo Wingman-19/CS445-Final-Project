@@ -55,6 +55,13 @@ public class Chunk {
     }
     
     public void rebuildMesh(float startX, float startY, float startZ) {
+        
+        // I wasn't sure what this should be so I just made it .05
+        double persistence = .10;
+        int seed = r.nextInt();
+        SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
+        
+        
         VBOTextureHandle = glGenBuffers();
         VBOColorHandle = glGenBuffers();
         VBOVertexHandle = glGenBuffers();
@@ -63,10 +70,16 @@ public class Chunk {
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
         for (float x = 0; x < CHUNK_SIZE; x+= 1) {
             for (float z = 0; z < CHUNK_SIZE; z += 1) {
-                for (float y = 0; y < CHUNK_SIZE; y += 1) {
-                    VertexTextureData.put(createTexCube((float)0, (float)0, Blocks[(int)x][(int)y][(int)z]));
+                
+                int i = (int)(startX + x * ((300 - startX) / 640));
+                int j = (int)(startZ + z * ((300 - startZ) / 480));
+                float height = (startY + (int)(100 * simplexNoise.getNoise(i,j)) * CUBE_LENGTH);
+                
+                for (float y = 0; y <= height; y += 1) {
+                    
                     VertexPositionData.put(createCube((float)(startX + x * CUBE_LENGTH), (float)(y * CUBE_LENGTH + (int)(CHUNK_SIZE * .8)), (float)(startZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[(int)x][(int)y][(int)z])));
+                    VertexTextureData.put(createTexCube((float)0, (float)0, Blocks[(int)x][(int)y][(int)z]));
                 }
             }
         }
