@@ -23,7 +23,7 @@ public class Block {
     private float x,y,z;
     
     public enum BlockType {
-        //thee six different types of blocks we can create
+        //the six different types of blocks we can create
         BlockType_Grass(0),
         BlockType_Sand(1),
         BlockType_Water(2),
@@ -33,40 +33,51 @@ public class Block {
         
         private int BlockID;
         
+        //Creates a BlockType with a given ID
         BlockType(int i) {
             BlockID = i;
         }
         
+        //Returns the ID of the BlockType
         public int GetID() {
             return BlockID;
         }
         
+        //Sets the ID of the BlockType
         public void setID(int i) {
             BlockID = i;
         }
     }
     
-    //constructor for the block that takes in what type of block it is
+    //Constructor: Block
+    //Purpose: Creates a block and sets the type to the given type
     public Block(BlockType type) {
         Type = type;
     }
     
-    //sets the location of the block
+    //Method: setCoords
+    //Purpose: This method sets the coordinates of the block
     public void setCoords(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
     
+    //Method: isActive
+    //Purpose: This method returns if the block is active
     public boolean isActive() {
         return isActive;
     }
     
-    public void SetActive(boolean active) {
+    //Method: setActive
+    //Purpose: This method sets the block to active or not active
+    public void setActive(boolean active) {
         isActive = active;
     }
     
-    public int GetID() {
+    //Method: getID
+    //Purpose: This method returns the ID of the block
+    public int getID() {
         return Type.GetID();
     }
 }

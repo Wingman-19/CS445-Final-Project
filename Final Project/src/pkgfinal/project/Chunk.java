@@ -142,7 +142,7 @@ public class Chunk {
     }
     
     private float[] getCubeColor(Block block) {
-        /*switch(block.GetID()) {
+        /*switch(block.getID()) {
             case 1:
                 return new float[] {0, 1, 0};
             case 2:
@@ -201,8 +201,8 @@ public class Chunk {
     //no default so there are potentially cases with no return statment
     public static float[] createTexCube(float x, float y, Block block) {
         float offset = (1024f / 16) / 1024f;
-        System.out.println("block ID: " + block.GetID());
-        switch (block.GetID()) {
+        System.out.println("block ID: " + block.getID());
+        switch (block.getID()) {
             case 0:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
