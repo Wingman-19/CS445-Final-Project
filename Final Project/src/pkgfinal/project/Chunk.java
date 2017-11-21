@@ -21,7 +21,6 @@ import java.nio.FloatBuffer;
 import java.util.Random;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.*;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -33,14 +32,17 @@ public class Chunk {
     static final int CHUNK_SIZE = 30;
     //Constant for the size of the cube
     static final int CUBE_LENGTH = 2;
-    private Block[][][] Blocks;
-    private int VBOVertexHandle;
-    private int VBOColorHandle;
-    private int StartX, StartY, StartZ;
-    private Random r;
-    private int VBOTextureHandle;
-    private Texture texture;
+    private Block[][][] Blocks; //3D space for our blocks of our chunk
+    private int VBOVertexHandle;    //Holds the vertex information
+    private int VBOColorHandle;     //Holds the color information
+    private int StartX, StartY, StartZ; //Start coords of the chunk
+    private Random r;   //RNG
+    private int VBOTextureHandle;   //Holds the texture information
+    private Texture texture;    //Holds the textures
     
+    //Method: render()
+    //Prupose: This method creates the scene with the appropriat block information
+    //         for the chunk
     public void render() {
         glPushMatrix();
             glBindBuffer(GL_ARRAY_BUFFER, VBOVertexHandle);
@@ -54,27 +56,38 @@ public class Chunk {
         glPopMatrix();
     }
     
+    //Method: rebuildMesh
+    //Purpose: This method creates the hills and valleys of the chunk
     public void rebuildMesh(float startX, float startY, float startZ) {
         
-        // I wasn't sure what this should be so I just made it .05
+        //Values between 0.05 and 0.08 seemed to give the best looking results
+        //Values greater than 0.15 crashed the program
         double persistence = .05;
         int seed = r.nextInt();
+        //Create the simplexNoise to be able to get various heights
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
         
-        VBOTextureHandle = glGenBuffers();
-        VBOColorHandle = glGenBuffers();
-        VBOVertexHandle = glGenBuffers();
+        VBOTextureHandle = glGenBuffers();  //Create the texture handle
+        VBOColorHandle = glGenBuffers();    //Create the color handle
+        VBOVertexHandle = glGenBuffers();   //Create the vertex handle
+        //Create the texture data
         FloatBuffer VertexTextureData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
+        //Create the Position data
         FloatBuffer VertexPositionData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
+        //Create the color data
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
+        //Iterate through each x,z coordinate position setting the heights
         for (float x = 0; x < CHUNK_SIZE; x+= 1) {
             for (float z = 0; z < CHUNK_SIZE; z += 1) {
                 
                 int i = (int)(startX + x * ((175 - startX) / 640));
                 int j = (int)(startZ + z * ((175 - startZ) / 480));
+                //Generate a height at the current position
+                //Take the absolut value of the simplexNoise value so that there are no negative heights
                 float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) ;
                 
+                //Update the data of each block at each position up to the height
                 for (float y = 0; y <= height; y += 1) {
                     
                     VertexPositionData.put(createCube((float)(startX + x * CUBE_LENGTH), (float)(y * CUBE_LENGTH + (int)(CHUNK_SIZE * .8)), (float)(startZ + z * CUBE_LENGTH)));
@@ -83,9 +96,9 @@ public class Chunk {
                 }
             }
         }
-        VertexTextureData.flip();
-        VertexColorData.flip();
-        VertexPositionData.flip();
+        VertexTextureData.flip();   //Flip the data so it is in the correct order
+        VertexColorData.flip();     //Flip the data so it is in the correct order
+        VertexPositionData.flip();  //Flip the data so it is in the correct order
         glBindBuffer(GL_ARRAY_BUFFER, VBOTextureHandle);
         glBufferData(GL_ARRAY_BUFFER, VertexTextureData, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -97,6 +110,8 @@ public class Chunk {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
+    //Method: createCubeVertexCol
+    //Purpose:
     private float[] createCubeVertexCol(float[] CubeColorArray) {
         float[] cubeColors = new float[CubeColorArray.length * 4 * 6];
         for (int i = 0; i < cubeColors.length; i++) {
@@ -105,6 +120,8 @@ public class Chunk {
         return cubeColors;
     }
     
+    //Static Method: createCube
+    //Purpse: This method creates a cube at the given location
     public static float[] createCube(float x, float y, float z) {
         int offset = CUBE_LENGTH / 2;
             return new float[] {
@@ -141,6 +158,8 @@ public class Chunk {
             };
     }
     
+    //Method: getCubeColor
+    //Purpose: This method returns the color white
     private float[] getCubeColor(Block block) {
         /*switch(block.getID()) {
             case 1:
@@ -154,7 +173,10 @@ public class Chunk {
         return new float[] {1, 1, 1};
     }
     
+    //Constructor: Chunck
+    //Purpose: Creates a chunk at the given coordinates
     public Chunk(int startX, int startY, int startZ) {
+        //Gets the texture image
         try {
             texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("terrain.png"));
             
@@ -164,25 +186,30 @@ public class Chunk {
             System.getProperty("user.dir"));
             e.printStackTrace();
         }
-        r = new Random();
+        r = new Random();   //Sets up the RNG
+        //Creates a new 3D block array
         Blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+        //Itterates through each block and creates it with a random texture
         for (int x = 0; x < CHUNK_SIZE; x++) {
             for (int y = 0; y < CHUNK_SIZE; y++) {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
+                    //Creates a Grass block
                     if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
+                    //Creates a Dirt block
                     } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
+                    //Creates a Water block
                     } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
+                    //Creates a Sand block
                     } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
+                    //Creates a Bedrock block
                     } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
+                    //Creates a Stone block
                     } else {
-                        //His pseudocode had BlockType_Default here but he never declared
-                        //created anything called BlockType_Default so I randomly chose
-                        //BlockType_Stone instead
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
                     }
                 }
@@ -194,15 +221,16 @@ public class Chunk {
         StartX = startX;
         StartY = startY;
         StartZ = startZ;
-        rebuildMesh(startX, startY, startZ);
+        rebuildMesh(startX, startY, startZ);    //Draws the chunk
     }
     
-    //error in switch statement, only one case of pseudocode in powerpoints and
-    //no default so there are potentially cases with no return statment
+    //Method createTextCube
+    //Purpose: This method gives the given block its texture
     public static float[] createTexCube(float x, float y, Block block) {
         float offset = (1024f / 16) / 1024f;
         System.out.println("block ID: " + block.getID());
         switch (block.getID()) {
+            //Grass Texture
             case 0:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
@@ -235,6 +263,7 @@ public class Chunk {
                     x + offset*4, y + offset*0, 
                     x + offset*4, y + offset*1,
                     x + offset*3, y + offset*1};
+            //Water Texture
             case 1:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
@@ -267,6 +296,7 @@ public class Chunk {
                     x + offset*0, y + offset*12, 
                     x + offset*0, y + offset*11,
                     x + offset*1, y + offset*11};
+            //Send Texture
             case 2:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
@@ -299,6 +329,7 @@ public class Chunk {
                     x + offset*1, y + offset*12, 
                     x + offset*1, y + offset*11,
                     x + offset*2, y + offset*11};
+            //Dirt Texture
             case 3:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
@@ -331,6 +362,7 @@ public class Chunk {
                     x + offset*2, y + offset*1, 
                     x + offset*2, y + offset*0,
                     x + offset*3, y + offset*0};
+            //Stone Texture
             case 4:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
@@ -363,6 +395,7 @@ public class Chunk {
                     x + offset*1, y + offset*1, 
                     x + offset*1, y + offset*2,
                     x + offset*0, y + offset*2};
+            //Bedrock Texture
             case 5:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
