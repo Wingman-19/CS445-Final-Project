@@ -1,8 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+* File: SimplexNoise_octave.java 
+* Group: The RenderMen
+* Members:
+*       * Marc Deaso
+*       * Omar Rodriguez
+*       * Nick Spencer
+*       * Luke Walsh
+*       * Alex Winger
+* Class: CS 445: – Computer Graphics 
+* 
+* Assignment: Final Project 
+* Date Last Modified: 11/20/2017
+* 
+* Purpose: A pre-written class that will generate noise so that the Minecraft
+*           world contains natural hills and valleys
+* 
+*******************************************************************************/
+
 package pkgfinal.project;
 
 import java.awt.Color;

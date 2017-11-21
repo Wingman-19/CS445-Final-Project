@@ -57,7 +57,7 @@ public class Chunk {
     public void rebuildMesh(float startX, float startY, float startZ) {
         
         // I wasn't sure what this should be so I just made it .05
-        double persistence = .08;
+        double persistence = .05;
         int seed = r.nextInt();
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
@@ -71,9 +71,9 @@ public class Chunk {
         for (float x = 0; x < CHUNK_SIZE; x+= 1) {
             for (float z = 0; z < CHUNK_SIZE; z += 1) {
                 
-                int i = (int)(startX + x * ((100- startX) / 640));
-                int j = (int)(startZ + z * ((100 - startZ) / 480));
-                float height = (startY + (int)(100 * simplexNoise.getNoise(i,j)) * CUBE_LENGTH);
+                int i = (int)(startX + x * ((175 - startX) / 640));
+                int j = (int)(startZ + z * ((175 - startZ) / 480));
+                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) ;
                 
                 for (float y = 0; y <= height; y += 1) {
                     
@@ -142,7 +142,7 @@ public class Chunk {
     }
     
     private float[] getCubeColor(Block block) {
-        /*switch(block.GetID()) {
+        /*switch(block.getID()) {
             case 1:
                 return new float[] {0, 1, 0};
             case 2:
@@ -201,8 +201,8 @@ public class Chunk {
     //no default so there are potentially cases with no return statment
     public static float[] createTexCube(float x, float y, Block block) {
         float offset = (1024f / 16) / 1024f;
-        System.out.println("block ID: " + block.GetID());
-        switch (block.GetID()) {
+        System.out.println("block ID: " + block.getID());
+        switch (block.getID()) {
             case 0:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
