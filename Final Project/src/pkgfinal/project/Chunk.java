@@ -57,7 +57,7 @@ public class Chunk {
     public void rebuildMesh(float startX, float startY, float startZ) {
         
         // I wasn't sure what this should be so I just made it .05
-        double persistence = .10;
+        double persistence = .05;
         int seed = r.nextInt();
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
@@ -73,7 +73,7 @@ public class Chunk {
                 
                 int i = (int)(startX + x * ((175 - startX) / 640));
                 int j = (int)(startZ + z * ((175 - startZ) / 480));
-                float height = (startY + (int)(100 * simplexNoise.getNoise(i,j)) * CUBE_LENGTH);
+                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) ;
                 
                 for (float y = 0; y <= height; y += 1) {
                     
