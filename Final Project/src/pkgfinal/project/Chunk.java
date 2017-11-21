@@ -10,7 +10,7 @@
 * Class: CS 445: – Computer Graphics 
 * 
 * Assignment: Final Project 
-* Date Last Modified: 11/12/2017
+* Date Last Modified: 11/20/2017
 * 
 * Purpose: Allows for fewer render calls while creating more blocks when called 
 * 
@@ -171,10 +171,14 @@ public class Chunk {
                 for (int z = 0; z < CHUNK_SIZE; z++) {
                     if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
-                    } else if (r.nextFloat() > 0.4f) {
+                    } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
-                    } else if (r.nextFloat() > 0.2f) {
+                    } else if (r.nextFloat() > 0.7f) {
                         Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
                     } else {
                         //His pseudocode had BlockType_Default here but he never declared
                         //created anything called BlockType_Default so I randomly chose
@@ -330,35 +334,35 @@ public class Chunk {
             case 4:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1,
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2,
                     // TOP!
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1,
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2,
                     // FRONT QUAD
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1,
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2,
                     // BACK QUAD
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1,
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2,
                     // LEFT QUAD
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1,
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2,
                     // RIGHT QUAD
-                    x + offset*2, y + offset*2, 
-                    x + offset*1, y + offset*2, 
-                    x + offset*1, y + offset*1,
-                    x + offset*2, y + offset*1};
+                    x + offset*0, y + offset*1, 
+                    x + offset*1, y + offset*1, 
+                    x + offset*1, y + offset*2,
+                    x + offset*0, y + offset*2};
             case 5:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
