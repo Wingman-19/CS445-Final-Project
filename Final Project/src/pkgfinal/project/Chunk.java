@@ -40,6 +40,57 @@ public class Chunk {
     private int VBOTextureHandle;   //Holds the texture information
     private Texture texture;    //Holds the textures
     
+    //Constructor: Chunck
+    //Purpose: Creates a chunk at the given coordinates
+    public Chunk(int startX, int startY, int startZ) {
+        //Gets the texture image
+        try {
+            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("terrain.png"));
+            
+        } catch (Exception e) {
+            System.out.print("ER-ROAR!");
+            System.out.println("Working Directory = " +
+            System.getProperty("user.dir"));
+            e.printStackTrace();
+        }
+        r = new Random();   //Sets up the RNG
+        //Creates a new 3D block array
+        Blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+        //Itterates through each block and creates it with a random texture
+        for (int x = 0; x < CHUNK_SIZE; x++) {
+            for (int y = 0; y < CHUNK_SIZE; y++) {
+                for (int z = 0; z < CHUNK_SIZE; z++) {
+                    //Creates a Grass block
+                    if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
+                    //Creates a Dirt block
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
+                    //Creates a Water block
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
+                    //Creates a Sand block
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
+                    //Creates a Bedrock block
+                    } else if (r.nextFloat() > 0.7f) {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
+                    //Creates a Stone block
+                    } else {
+                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
+                    }
+                }
+            }
+        }
+        VBOTextureHandle = glGenBuffers();
+        VBOColorHandle = glGenBuffers();
+        VBOVertexHandle = glGenBuffers();
+        StartX = startX;
+        StartY = startY;
+        StartZ = startZ;
+        rebuildMesh(startX, startY, startZ);    //Draws the chunk
+    }
+    
     //Method: render()
     //Prupose: This method creates the scene with the appropriat block information
     //         for the chunk
@@ -67,6 +118,8 @@ public class Chunk {
         //Create the simplexNoise to be able to get various heights
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
+        //Used to make all blocks on a level the same texture
+        Block.BlockType[] terrainLevels = getTerrainLevels();
         
         VBOTextureHandle = glGenBuffers();  //Create the texture handle
         VBOColorHandle = glGenBuffers();    //Create the color handle
@@ -85,14 +138,18 @@ public class Chunk {
                 int j = (int)(startZ + z * ((175 - startZ) / 480));
                 //Generate a height at the current position
                 //Take the absolut value of the simplexNoise value so that there are no negative heights
-                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) ;
+                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) + 1;
                 
                 //Update the data of each block at each position up to the height
                 for (float y = 0; y <= height; y += 1) {
-                    
                     VertexPositionData.put(createCube((float)(startX + x * CUBE_LENGTH), (float)(y * CUBE_LENGTH + (int)(CHUNK_SIZE * .8)), (float)(startZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[(int)x][(int)y][(int)z])));
-                    VertexTextureData.put(createTexCube((float)0, (float)0, Blocks[(int)x][(int)y][(int)z]));
+                    //If we are not at the top of the stack yet, set the texture to the texture of the current level
+                    if(y != height)
+                        VertexTextureData.put(createTexCube(0.0f, 0.0f, terrainLevels[(int)y]));
+                    //Otherwise set the texture to the texture of the top level
+                    else
+                        VertexTextureData.put(createTexCube(0.0f, 0.0f, terrainLevels[terrainLevels.length - 1]));
                 }
             }
         }
@@ -108,6 +165,34 @@ public class Chunk {
         glBindBuffer(GL_ARRAY_BUFFER, VBOColorHandle);
         glBufferData(GL_ARRAY_BUFFER, VertexColorData, GL_STATIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    
+    //Method: getTerrainLevels
+    //Purpose: This method gives each level of the chunk a specific texture
+    //         The lowest level is always bedrock
+    private Block.BlockType[] getTerrainLevels()
+    {
+        //The array of the textures at each level
+        Block.BlockType[] terrainLevels = new Block.BlockType[CHUNK_SIZE];
+        Random rand = new Random(); //Used to get a random texture on the top
+        //The lowest level is always bedrock texture
+        terrainLevels[0] = Block.BlockType.BlockType_Bedrock;
+        //Move through the array giving each level a type except for the last level
+        for(int i = 1; i < terrainLevels.length - 1; i++)
+        {
+            if(rand.nextFloat() > 0.5f)
+                terrainLevels[i] = Block.BlockType.BlockType_Dirt;
+            else
+                terrainLevels[i] = Block.BlockType.BlockType_Stone;
+        }
+        //Give the last level a type
+        if(rand.nextFloat() > 0.7f)
+            terrainLevels[terrainLevels.length - 1] = Block.BlockType.BlockType_Sand;
+        else if(rand.nextFloat() > 0.7f)
+            terrainLevels[terrainLevels.length - 1] = Block.BlockType.BlockType_Water;
+        else
+            terrainLevels[terrainLevels.length - 1] = Block.BlockType.BlockType_Grass;
+        return terrainLevels;
     }
     
     //Method: createCubeVertexCol
@@ -173,65 +258,13 @@ public class Chunk {
         return new float[] {1, 1, 1};
     }
     
-    //Constructor: Chunck
-    //Purpose: Creates a chunk at the given coordinates
-    public Chunk(int startX, int startY, int startZ) {
-        //Gets the texture image
-        try {
-            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("terrain.png"));
-            
-        } catch (Exception e) {
-            System.out.print("ER-ROAR!");
-            System.out.println("Working Directory = " +
-            System.getProperty("user.dir"));
-            e.printStackTrace();
-        }
-        r = new Random();   //Sets up the RNG
-        //Creates a new 3D block array
-        Blocks = new Block[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
-        //Itterates through each block and creates it with a random texture
-        for (int x = 0; x < CHUNK_SIZE; x++) {
-            for (int y = 0; y < CHUNK_SIZE; y++) {
-                for (int z = 0; z < CHUNK_SIZE; z++) {
-                    //Creates a Grass block
-                    if (r.nextFloat() > 0.7f) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Grass);
-                    //Creates a Dirt block
-                    } else if (r.nextFloat() > 0.7f) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Dirt);
-                    //Creates a Water block
-                    } else if (r.nextFloat() > 0.7f) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Water);
-                    //Creates a Sand block
-                    } else if (r.nextFloat() > 0.7f) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Sand);
-                    //Creates a Bedrock block
-                    } else if (r.nextFloat() > 0.7f) {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Bedrock);
-                    //Creates a Stone block
-                    } else {
-                        Blocks[x][y][z] = new Block(Block.BlockType.BlockType_Stone);
-                    }
-                }
-            }
-        }
-        VBOTextureHandle = glGenBuffers();
-        VBOColorHandle = glGenBuffers();
-        VBOVertexHandle = glGenBuffers();
-        StartX = startX;
-        StartY = startY;
-        StartZ = startZ;
-        rebuildMesh(startX, startY, startZ);    //Draws the chunk
-    }
-    
     //Method createTextCube
     //Purpose: This method gives the given block its texture
-    public static float[] createTexCube(float x, float y, Block block) {
+    public static float[] createTexCube(float x, float y, Block.BlockType type) {
         float offset = (1024f / 16) / 1024f;
-        System.out.println("block ID: " + block.getID());
-        switch (block.getID()) {
+        switch(type) {
             //Grass Texture
-            case 0:
+            case BlockType_Grass:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*3, y + offset*10, 
@@ -264,7 +297,7 @@ public class Chunk {
                     x + offset*4, y + offset*1,
                     x + offset*3, y + offset*1};
             //Water Texture
-            case 1:
+            case BlockType_Water:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*1, y + offset*12, 
@@ -296,8 +329,8 @@ public class Chunk {
                     x + offset*0, y + offset*12, 
                     x + offset*0, y + offset*11,
                     x + offset*1, y + offset*11};
-            //Send Texture
-            case 2:
+            //Sand Texture
+            case BlockType_Sand:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*2, y + offset*12, 
@@ -330,7 +363,7 @@ public class Chunk {
                     x + offset*1, y + offset*11,
                     x + offset*2, y + offset*11};
             //Dirt Texture
-            case 3:
+            case BlockType_Dirt:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*3, y + offset*1, 
@@ -363,7 +396,7 @@ public class Chunk {
                     x + offset*2, y + offset*0,
                     x + offset*3, y + offset*0};
             //Stone Texture
-            case 4:
+            case BlockType_Stone:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*0, y + offset*1, 
@@ -396,7 +429,7 @@ public class Chunk {
                     x + offset*1, y + offset*2,
                     x + offset*0, y + offset*2};
             //Bedrock Texture
-            case 5:
+            case BlockType_Bedrock:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*2, y + offset*2, 
@@ -429,6 +462,6 @@ public class Chunk {
                     x + offset*1, y + offset*1,
                     x + offset*2, y + offset*1};
         }
-        return null;//Fix this
+        return null;
     }
 }

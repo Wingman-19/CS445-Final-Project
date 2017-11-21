@@ -190,7 +190,7 @@ public class FPCameraController
             glLoadIdentity();
             camera.lookThrough();   //Performs the transformations
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-            chunk.render();   //Draws the scene (A cube for now)
+            chunk.render();   //Draws the scene
             Display.update();
             Display.sync(60);
         }
