@@ -10,7 +10,7 @@
 * Class: CS 445: – Computer Graphics 
 * 
 * Assignment: Final Project 
-* Date Last Modified: 11/12/2017
+* Date Last Modified: 11/21/2017
 * 
 * Purpose: Used to specify one of six types of materials and create a block of it
 * 
@@ -53,6 +53,7 @@ public class Block {
     //Purpose: Creates a block and sets the type to the given type
     public Block(BlockType type) {
         Type = type;
+        isActive = false;
     }
     
     //Method: setCoords
@@ -79,5 +80,10 @@ public class Block {
     //Purpose: This method returns the ID of the block
     public int getID() {
         return Type.GetID();
+    }
+    
+    public void setID(BlockType type)
+    {
+        Type = type;
     }
 }

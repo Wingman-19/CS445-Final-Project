@@ -144,10 +144,13 @@ public class FPCameraController
     //         the render method and showing the display to the user
     public void gameLoop()
     {
-        //Our camera
-        FPCameraController camera = new FPCameraController(0, 0, 0);
-        //I randomly chose this to be 0, 0, 0 because I didn't know what else to make it
+        //Create a chunk
         Chunk chunk = new Chunk(0, 0, 0);
+        int[] pos = chunk.getHighPos(); //Get the coordinates of the highest block in our chunk
+        //Our camera starting just above the highest position on our map
+        FPCameraController camera = new FPCameraController(-pos[0] * Chunk.CUBE_LENGTH,
+                                                           -pos[1] * Chunk.CUBE_LENGTH - Chunk.CHUNK_SIZE,
+                                                           -pos[2] * Chunk.CUBE_LENGTH);
         float dx = 0.0f;    //Change in the x direction
         float dy = 0.0f;    //Change in the y direction
         float dt = 0.0f;    //Change in the time

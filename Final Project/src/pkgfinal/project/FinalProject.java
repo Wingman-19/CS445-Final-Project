@@ -10,7 +10,7 @@
 * Class: CS 445: – Computer Graphics 
 * 
 * Assignment: Final Project 
-* Date Last Modified: 11/12/2017 
+* Date Last Modified: 11/21/2017 
 * 
 * Purpose: Creates the display and calls the camera's gameLoop method
 * 
