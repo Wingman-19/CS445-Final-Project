@@ -86,7 +86,7 @@ public class FinalProject
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);   //Black background
+        glClearColor(0.6f, 0.8f, 1.0f, 0.0f);   //Sky colored background
         
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();

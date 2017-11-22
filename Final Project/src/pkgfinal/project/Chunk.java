@@ -111,6 +111,7 @@ public class Chunk {
     //Purpose: This method creates the hills and valleys of the chunk
     public void rebuildMesh(float startX, float startY, float startZ) {
         
+        Random rand = new Random();
         //Values between 0.05 and 0.08 seemed to give the best looking results
         //Values greater than 0.15 crashed the program
         double persistence = .05;
@@ -118,8 +119,10 @@ public class Chunk {
         //Create the simplexNoise to be able to get various heights
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
+        float lowestHeight = CHUNK_SIZE;
         //Used to make all blocks on a level the same texture
         Block.BlockType[] terrainLevels = getTerrainLevels();
+        float[][] heights = new float[CHUNK_SIZE][CHUNK_SIZE];
         
         VBOTextureHandle = glGenBuffers();  //Create the texture handle
         VBOColorHandle = glGenBuffers();    //Create the color handle
@@ -131,25 +134,52 @@ public class Chunk {
         //Create the color data
         FloatBuffer VertexColorData = BufferUtils.createFloatBuffer((CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE) * 6 * 12);
         //Iterate through each x,z coordinate position setting the heights
-        for (float x = 0; x < CHUNK_SIZE; x+= 1) {
-            for (float z = 0; z < CHUNK_SIZE; z += 1) {
+        for (int x = 0; x < CHUNK_SIZE; x+= 1) {
+            for (int z = 0; z < CHUNK_SIZE; z += 1) {
                 
                 int i = (int)(startX + x * ((175 - startX) / 640));
                 int j = (int)(startZ + z * ((175 - startZ) / 480));
                 //Generate a height at the current position
                 //Take the absolut value of the simplexNoise value so that there are no negative heights
-                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH) + 1;
-                
+                float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH);
+                if(height < 30)
+                    height++;
+                if(height < lowestHeight)
+                    lowestHeight = height;
+                heights[x][z] = height;
+            }
+        }
+        
+        for(int x = 0; x < CHUNK_SIZE; x++)
+        {
+            for(int z = 0; z < CHUNK_SIZE; z++)
+            {
                 //Update the data of each block at each position up to the height
-                for (float y = 0; y <= height; y += 1) {
+                for (float y = 0; y <= heights[x][z]; y += 1) {
                     VertexPositionData.put(createCube((float)(startX + x * CUBE_LENGTH), (float)(y * CUBE_LENGTH + (int)(CHUNK_SIZE * .8)), (float)(startZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[(int)x][(int)y][(int)z])));
-                    //If we are not at the top of the stack yet, set the texture to the texture of the current level
-                    if(y != height)
-                        VertexTextureData.put(createTexCube(0.0f, 0.0f, terrainLevels[(int)y]));
+                    if(y == 0)
+                        VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Bedrock));
+                    else if(y == heights[x][z])
+                    {
+                        if(heights[x][z] == lowestHeight)
+                            VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Water));
+                        else
+                        {
+                            if(rand.nextFloat() > 0.5f)
+                                VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Sand)); 
+                            else
+                                VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Grass));
+                        }
+                    }
                     //Otherwise set the texture to the texture of the top level
                     else
-                        VertexTextureData.put(createTexCube(0.0f, 0.0f, terrainLevels[terrainLevels.length - 1]));
+                    {
+                        if(rand.nextFloat() > 0.5f)
+                            VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Dirt));
+                        else
+                            VertexTextureData.put(createTexCube(0.0f, 0.0f, Block.BlockType.BlockType_Stone));
+                    }
                 }
             }
         }
@@ -296,8 +326,8 @@ public class Chunk {
                     x + offset*4, y + offset*0, 
                     x + offset*4, y + offset*1,
                     x + offset*3, y + offset*1};
-            //Water Texture
-            case BlockType_Water:
+            //Sand Texture
+            case BlockType_Sand:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*1, y + offset*12, 
@@ -329,8 +359,8 @@ public class Chunk {
                     x + offset*0, y + offset*12, 
                     x + offset*0, y + offset*11,
                     x + offset*1, y + offset*11};
-            //Sand Texture
-            case BlockType_Sand:
+            //Water Texture
+            case BlockType_Water:
                 return new float[] {
                     // BOTTOM QUAD(DOWN=+Y)
                     x + offset*2, y + offset*12, 
