@@ -39,8 +39,8 @@ public class Chunk {
     private Random r;   //RNG
     private int VBOTextureHandle;   //Holds the texture information
     private Texture texture;    //Holds the textures
-    private int[] highPos;
-    private float[][] heights;
+    private int[] highPos;      //Holds the highest position of the map
+    private float[][] heights;  //Holds the heights at each position
     
     //Constructor: Chunck
     //Purpose: Creates a chunk at the given coordinates
@@ -121,8 +121,9 @@ public class Chunk {
         //Create the simplexNoise to be able to get various heights
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
-        float lowestHeight = CHUNK_SIZE;
+        float lowestHeight = CHUNK_SIZE;    //Keep track of the lowest position
         heights = new float[CHUNK_SIZE][CHUNK_SIZE];
+        //Start the highest position at (0,0,0)
         highPos[0] = 0;
         highPos[1] = 0;
         highPos[2] = 0;
@@ -145,20 +146,24 @@ public class Chunk {
                 //Generate a height at the current position
                 //Take the absolut value of the simplexNoise value so that there are no negative heights
                 float height = (startY + (int)(100 * Math.abs(simplexNoise.getNoise(i,j))) * CUBE_LENGTH);
+                //Add one to each height that is less than the chunk size
                 if(height < CHUNK_SIZE)
                     height++;
+                //If the current height is lower than the lowest, update the lowest
                 if(height < lowestHeight)
                     lowestHeight = height;
+                //If the current position is higher than the highest, update the highest
                 if(height > highPos[1])
                 {
                     highPos[0] = x;
                     highPos[1] = (int)height;
                     highPos[2] = z;
                 }
-                heights[x][z] = height;
+                heights[x][z] = height; //Add the height to the heights array
             }
         }
         
+        //Move through and place the appropriate blocks at each position
         for(int x = 0; x < CHUNK_SIZE; x++)
         {
             for(int z = 0; z < CHUNK_SIZE; z++)
@@ -167,12 +172,16 @@ public class Chunk {
                 for (int y = 0; y <= heights[x][z]; y += 1) {
                     VertexPositionData.put(createCube((float)(startX + x * CUBE_LENGTH), (float)(y * CUBE_LENGTH + (int)(CHUNK_SIZE * .8)), (float)(startZ + z * CUBE_LENGTH)));
                     VertexColorData.put(createCubeVertexCol(getCubeColor(Blocks[x][y][z])));
+                    //Bottom layer so set it to Bedrock
                     if(y == 0)
                         Blocks[x][y][z].setID(Block.BlockType.BlockType_Bedrock);
+                    //Highest layer so set it to Water, Sand, or Grass
                     else if(y == heights[x][z])
                     {
+                        //This is the smallest stack so set it to Water
                         if(heights[x][z] == lowestHeight)
                             Blocks[x][y][z].setID(Block.BlockType.BlockType_Water);
+                        //Otherwise set it to either Sand or Grass
                         else
                         {
                             if(r.nextFloat() > 0.5f)
@@ -181,7 +190,7 @@ public class Chunk {
                                 Blocks[x][y][z].setID(Block.BlockType.BlockType_Grass);
                         }
                     }
-                    //Otherwise set the texture to the texture of the top level
+                    //Otherwise set the texture to Dirt or Stone
                     else
                     {
                         if(r.nextFloat() > 0.5f)
@@ -478,26 +487,36 @@ public class Chunk {
         return null;
     }
     
+    //Method: getHighPos
+    //Purpose: This method returns the highPos
     public int[] getHighPos()
     {
         return highPos;
     }
     
+    //Method: getHeights
+    //Purpose: This method returns the heights array
     public float[][] getHeights()
     {
         return heights;
     }
     
+    //Method: getStartX
+    //Purpose: This method returns the startX
     public int getStartX()
     {
         return StartX;
     }
     
+    //Method: getStartY
+    //Purpose: This method returns the startY
     public int getStartY()
     {
         return StartY;
     }
     
+    //Method: getStartZ
+    //Purpose: This method returns the startZ
     public int getStartZ()
     {
         return StartZ;
