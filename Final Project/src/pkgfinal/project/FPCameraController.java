@@ -45,6 +45,7 @@ public class FPCameraController
     private float yaw = 0.0f;   //Rotation around the Y-axis
     private float pitch = 0.0f; //Rotation around the X-axis
     private Vector3Float me;
+    private Chunk chunk;
     
     //Constructor: FPCameraController
     //Purpose: This constructor sets up the position of the camera at the x-, y-,
@@ -76,6 +77,32 @@ public class FPCameraController
         float zOffset = distance * (float)(Math.cos(Math.toRadians(yaw)));
         position.x -= xOffset;  //Updates the x position with the new distance
         position.z += zOffset;  //Updates the z positoin with the new distance
+        //Try to update the y-position with the new x- and z- positions
+        try
+        {
+            updateYPos();
+        }catch(Exception e1)    //Doesn't work
+        {
+            position.x += xOffset;  //Reset x
+            //Try again with new z- and old x- position
+            try
+            {
+                updateYPos();
+            }catch(Exception e2)    //Doesn't work again
+            {
+                position.x -= xOffset;  //Get new x- position
+                position.z -= zOffset;  //Reset z
+                //Try again with new x- and old z- position
+                try
+                {
+                    updateYPos();
+                }catch(Exception e3) //This doesn't work either
+                {
+                    position.x += xOffset;  //Reset x
+                }
+            }
+        }
+
     }
     
     //Method: moveBackward
@@ -88,6 +115,31 @@ public class FPCameraController
         float zOffset = distance * (float)(Math.cos(Math.toRadians(yaw)));
         position.x += xOffset;  //Updates the x position with the new distance
         position.z -= zOffset;  //Updates the z position with the new distance
+        //Try to update the y-position with the new x- and z- positions
+        try
+        {
+            updateYPos();
+        }catch(Exception e1)    //Doesn't work
+        {
+            position.x -= xOffset;  //Reset x
+            //Try again with new z- and old x- position
+            try
+            {
+                updateYPos();
+            }catch(Exception e2)    //Doesn't work again
+            {
+                position.x += xOffset;  //Get new x- position
+                position.z += zOffset;  //Reset z
+                //Try again with new x- and old z- position
+                try
+                {
+                    updateYPos();
+                }catch(Exception e3) //This doesn't work either
+                {
+                    position.x -= xOffset;  //Reset x
+                }
+            }
+        }
     }
     
     //Method: strafeLeft
@@ -99,6 +151,31 @@ public class FPCameraController
         float zOffset = distance * (float)(Math.cos(Math.toRadians(yaw - 90)));
         position.x -= xOffset;  //Updates the x position with the new distance
         position.z += zOffset;  //Updates the z position with the new distance
+        //Try to update the y-position with the new x- and z- positions
+        try
+        {
+            updateYPos();
+        }catch(Exception e1)    //Doesn't work
+        {
+            position.x += xOffset;  //Reset x
+            //Try again with new z- and old x- position
+            try
+            {
+                updateYPos();
+            }catch(Exception e2)    //Doesn't work again
+            {
+                position.x -= xOffset;  //Get new x- position
+                position.z -= zOffset;  //Reset z
+                //Try again with new x- and old z- position
+                try
+                {
+                    updateYPos();
+                }catch(Exception e3) //This doesn't work either
+                {
+                    position.x += xOffset;  //Reset x
+                }
+            }
+        }
     }
     
     //Method: strafeRight
@@ -110,6 +187,31 @@ public class FPCameraController
         float zOffset = distance * (float)(Math.cos(Math.toRadians(yaw + 90)));
         position.x -= xOffset;  //Updates the x position with the new distance
         position.z += zOffset;  //Updates the z position with the new distance
+        //Try to update the y-position with the new x- and z- positions
+        try
+        {
+            updateYPos();
+        }catch(Exception e1)    //Doesn't work
+        {
+            position.x += xOffset;  //Reset x
+            //Try again with new z- and old x- position
+            try
+            {
+                updateYPos();
+            }catch(Exception e2)    //Doesn't work again
+            {
+                position.x -= xOffset;  //Get new x- position
+                position.z -= zOffset;  //Reset z
+                //Try again with new x- and old z- position
+                try
+                {
+                    updateYPos();
+                }catch(Exception e3) //This doesn't work either
+                {
+                    position.x += xOffset;  //Reset x
+                }
+            }
+        }
     }
     
     //Method: mvoeUp
@@ -151,6 +253,7 @@ public class FPCameraController
         FPCameraController camera = new FPCameraController(-pos[0] * Chunk.CUBE_LENGTH,
                                                            -pos[1] * Chunk.CUBE_LENGTH - Chunk.CHUNK_SIZE,
                                                            -pos[2] * Chunk.CUBE_LENGTH);
+        camera.chunk = chunk;
         float dx = 0.0f;    //Change in the x direction
         float dy = 0.0f;    //Change in the y direction
         float dt = 0.0f;    //Change in the time
@@ -198,6 +301,19 @@ public class FPCameraController
             Display.sync(60);
         }
         Display.destroy();  //Closes the display
+    }
+    
+    private void updateYPos()
+    {
+        if((int)(Math.abs(position.x / Chunk.CUBE_LENGTH)) <= Chunk.CHUNK_SIZE && position.x < 1 &&
+           (int)(Math.abs(position.z / Chunk.CUBE_LENGTH)) <= Chunk.CHUNK_SIZE && position.z < 1)
+        {
+            position.y = -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))];
+            position.y *= Chunk.CUBE_LENGTH;
+            position.y -= Chunk.CHUNK_SIZE;
+        }
+        else
+            throw new ArrayIndexOutOfBoundsException();
     }
     
     //Method: render

@@ -40,6 +40,7 @@ public class Chunk {
     private int VBOTextureHandle;   //Holds the texture information
     private Texture texture;    //Holds the textures
     private int[] highPos;
+    private float[][] heights;
     
     //Constructor: Chunck
     //Purpose: Creates a chunk at the given coordinates
@@ -121,7 +122,7 @@ public class Chunk {
         SimplexNoise simplexNoise = new SimplexNoise(CHUNK_SIZE,persistence,seed);
         
         float lowestHeight = CHUNK_SIZE;
-        float[][] heights = new float[CHUNK_SIZE][CHUNK_SIZE];
+        heights = new float[CHUNK_SIZE][CHUNK_SIZE];
         highPos[0] = 0;
         highPos[1] = 0;
         highPos[2] = 0;
@@ -480,5 +481,25 @@ public class Chunk {
     public int[] getHighPos()
     {
         return highPos;
+    }
+    
+    public float[][] getHeights()
+    {
+        return heights;
+    }
+    
+    public int getStartX()
+    {
+        return StartX;
+    }
+    
+    public int getStartY()
+    {
+        return StartY;
+    }
+    
+    public int getStartZ()
+    {
+        return StartZ;
     }
 }
