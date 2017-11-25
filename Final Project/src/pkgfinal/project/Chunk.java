@@ -122,9 +122,9 @@ public class Chunk {
         
         float lowestHeight = CHUNK_SIZE;
         float[][] heights = new float[CHUNK_SIZE][CHUNK_SIZE];
-        highPos[0] = 0;
+        highPos[0] = CHUNK_SIZE/2;
         highPos[1] = 0;
-        highPos[2] = 0;
+        highPos[2] = CHUNK_SIZE/2;
         
         VBOTextureHandle = glGenBuffers();  //Create the texture handle
         VBOColorHandle = glGenBuffers();    //Create the color handle
@@ -150,9 +150,9 @@ public class Chunk {
                     lowestHeight = height;
                 if(height > highPos[1])
                 {
-                    highPos[0] = x;
+                    //highPos[0] = x;
                     highPos[1] = (int)height;
-                    highPos[2] = z;
+                    //highPos[2] = z;
                 }
                 heights[x][z] = height;
             }
