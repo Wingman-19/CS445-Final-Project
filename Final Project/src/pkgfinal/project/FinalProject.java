@@ -10,24 +10,29 @@
 * Class: CS 445: – Computer Graphics 
 * 
 * Assignment: Final Project 
-* Date Last Modified: 11/21/2017 
+* Date Last Modified: 11/25/2017 
 * 
 * Purpose: Creates the display and calls the camera's gameLoop method
 * 
 *******************************************************************************/ 
 package pkgfinal.project;
 
-import org.lwjgl.input.Keyboard;
+//import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.util.glu.GLU;
+import java.nio.FloatBuffer;
+import org.lwjgl.BufferUtils;
 
 public class FinalProject
 {
     //Camera object used to call the gameLoop method
     private FPCameraController fp;
     private DisplayMode displayMode;    //The display mode for the game
+    
+    private FloatBuffer lightPosition;
+    private FloatBuffer whiteLight;
     
     //Method: main
     //Purpose: This is the main method of the program. It creates a new instance
@@ -96,5 +101,20 @@ public class FinalProject
         glMatrixMode(GL_MODELVIEW);
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glEnable(GL_DEPTH_TEST);    //Hide the hidden faces of objects
+        
+        initLightArrays();
+        glLight(GL_LIGHT0, GL_POSITION, lightPosition); //sets our light’s position
+        glLight(GL_LIGHT0, GL_SPECULAR, whiteLight);//sets our specular light
+        glLight(GL_LIGHT0, GL_DIFFUSE, whiteLight);//sets our diffuse light
+        glLight(GL_LIGHT0, GL_AMBIENT, whiteLight);//sets our ambient light
+        glEnable(GL_LIGHTING);//enables our lighting
+        glEnable(GL_LIGHT0);//enables light0
+    }
+    
+    private void initLightArrays() {
+        lightPosition = BufferUtils.createFloatBuffer(4);
+        lightPosition.put(0.0f).put(0.0f).put(0.0f).put(1.0f).flip();
+        whiteLight = BufferUtils.createFloatBuffer(4);
+        whiteLight.put(1.0f).put(1.0f).put(1.0f).put(0.0f).flip();
     }
 }

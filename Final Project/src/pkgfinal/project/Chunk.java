@@ -126,7 +126,7 @@ public class Chunk {
         //Start the highest position at (0,0,0)
         highPos[0] = 0;
         highPos[1] = 0;
-        highPos[2] = 0;
+        highPos[2] = CHUNK_SIZE/2;
         
         VBOTextureHandle = glGenBuffers();  //Create the texture handle
         VBOColorHandle = glGenBuffers();    //Create the color handle
@@ -155,9 +155,9 @@ public class Chunk {
                 //If the current position is higher than the highest, update the highest
                 if(height > highPos[1])
                 {
-                    highPos[0] = x;
+                    //highPos[0] = x;
                     highPos[1] = (int)height;
-                    highPos[2] = z;
+                    //highPos[2] = z;
                 }
                 heights[x][z] = height; //Add the height to the heights array
             }
