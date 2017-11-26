@@ -30,6 +30,8 @@
 *             does not account for the edges or changing the height of the camera
 *           - When Explore mode is off, the camera stays on the map and raises
 *             and lowers with respect to the height of the current location
+*               + NOTE: This is changing with the jumping (Mentioned below)
+*       * The j key allows the camera to "Jump"
 * 
 *******************************************************************************/ 
 package pkgfinal.project;
@@ -43,6 +45,8 @@ import org.lwjgl.Sys;
 
 public class FPCameraController
 {
+    private final float ACCELERATION = -0.5f;  //Constant acceleration for jumping
+    
     //The camera's position
     private Vector3f position = null;
     private Vector3f lPosition = null;
@@ -52,6 +56,9 @@ public class FPCameraController
     private Vector3Float me;
     private Chunk chunk;
     private boolean explore; //Control explore mode
+    private long startTime; //Start time when jumping
+    private long curTime;   //The current time since we started to jump
+    private boolean falling;    //Flag for if the player is jumping
     
     //Constructor: FPCameraController
     //Purpose: This constructor sets up the position of the camera at the x-, y-,
@@ -64,6 +71,9 @@ public class FPCameraController
         lPosition.y = 15f;  //Change y of lPosition to 15
         lPosition.z = 0f;   //Change z of lPosition to 0
         explore = true; //Start with explore mode on
+        falling = false;    //Initialize the flag to not falling
+        startTime = 0;      //Start time is 0
+        curTime = 0;        //End time is 0
     }
     
     //Method: yaw
@@ -87,31 +97,31 @@ public class FPCameraController
         //If Explore mode is off adjust the height
         if(!explore)
         {
-            //Try to update the y-position with the new x- and z- positions
-            try
-            {
-                updateYPos();
-            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
-            {
-                position.x += xOffset;  //Reset x
-                //Try again with new z- and old x- position
-                try
-                {
-                    updateYPos();
-                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
-                {
-                    position.x -= xOffset;  //Get new x- position
-                    position.z -= zOffset;  //Reset z
-                    //Try again with new x- and old z- position
-                    try
-                    {
-                        updateYPos();
-                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
-                    {
-                        position.x += xOffset;  //Reset x
-                    }
-                }
-            }
+//            //Try to update the y-position with the new x- and z- positions
+//            try
+//            {
+//                updateYPos();
+//            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
+//            {
+//                position.x += xOffset;  //Reset x
+//                //Try again with new z- and old x- position
+//                try
+//                {
+//                    updateYPos();
+//                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
+//                {
+//                    position.x -= xOffset;  //Get new x- position
+//                    position.z -= zOffset;  //Reset z
+//                    //Try again with new x- and old z- position
+//                    try
+//                    {
+//                        updateYPos();
+//                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
+//                    {
+//                        position.x += xOffset;  //Reset x
+//                    }
+//                }
+//            }
         }
     }
     
@@ -128,31 +138,31 @@ public class FPCameraController
         //If Explore mode is off adjust the height
         if(!explore)
         {
-            //Try to update the y-position with the new x- and z- positions
-            try
-            {
-                updateYPos();
-            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
-            {
-                position.x -= xOffset;  //Reset x
-                //Try again with new z- and old x- position
-                try
-                {
-                    updateYPos();
-                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
-                {
-                    position.x += xOffset;  //Get new x- position
-                    position.z += zOffset;  //Reset z
-                    //Try again with new x- and old z- position
-                    try
-                    {
-                        updateYPos();
-                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
-                    {
-                        position.x -= xOffset;  //Reset x
-                    }
-                }
-            }
+//            //Try to update the y-position with the new x- and z- positions
+//            try
+//            {
+//                updateYPos();
+//            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
+//            {
+//                position.x -= xOffset;  //Reset x
+//                //Try again with new z- and old x- position
+//                try
+//                {
+//                    updateYPos();
+//                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
+//                {
+//                    position.x += xOffset;  //Get new x- position
+//                    position.z += zOffset;  //Reset z
+//                    //Try again with new x- and old z- position
+//                    try
+//                    {
+//                        updateYPos();
+//                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
+//                    {
+//                        position.x -= xOffset;  //Reset x
+//                    }
+//                }
+//            }
         }
     }
     
@@ -168,31 +178,31 @@ public class FPCameraController
         //If Explore mode is off adjust the height
         if(!explore)
         {
-            //Try to update the y-position with the new x- and z- positions
-            try
-            {
-                updateYPos();
-            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
-            {
-                position.x += xOffset;  //Reset x
-                //Try again with new z- and old x- position
-                try
-                {
-                    updateYPos();
-                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
-                {
-                    position.x -= xOffset;  //Get new x- position
-                    position.z -= zOffset;  //Reset z
-                    //Try again with new x- and old z- position
-                    try
-                    {
-                        updateYPos();
-                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
-                    {
-                        position.x += xOffset;  //Reset x
-                    }
-                }
-            }
+//            //Try to update the y-position with the new x- and z- positions
+//            try
+//            {
+//                updateYPos();
+//            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
+//            {
+//                position.x += xOffset;  //Reset x
+//                //Try again with new z- and old x- position
+//                try
+//                {
+//                    updateYPos();
+//                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
+//                {
+//                    position.x -= xOffset;  //Get new x- position
+//                    position.z -= zOffset;  //Reset z
+//                    //Try again with new x- and old z- position
+//                    try
+//                    {
+//                        updateYPos();
+//                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
+//                    {
+//                        position.x += xOffset;  //Reset x
+//                    }
+//                }
+//            }
         }
     }
     
@@ -208,31 +218,31 @@ public class FPCameraController
         //If Explore mode is off adjust the height
         if(!explore)
         {
-            //Try to update the y-position with the new x- and z- positions
-            try
-            {
-                updateYPos();
-            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
-            {
-                position.x += xOffset;  //Reset x
-                //Try again with new z- and old x- position
-                try
-                {
-                    updateYPos();
-                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
-                {
-                    position.x -= xOffset;  //Get new x- position
-                    position.z -= zOffset;  //Reset z
-                    //Try again with new x- and old z- position
-                    try
-                    {
-                        updateYPos();
-                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
-                    {
-                        position.x += xOffset;  //Reset x
-                    }
-                }
-            }
+//            //Try to update the y-position with the new x- and z- positions
+//            try
+//            {
+//                updateYPos();
+//            }catch(ArrayIndexOutOfBoundsException e1)    //Doesn't work
+//            {
+//                position.x += xOffset;  //Reset x
+//                //Try again with new z- and old x- position
+//                try
+//                {
+//                    updateYPos();
+//                }catch(ArrayIndexOutOfBoundsException e2)    //Doesn't work again
+//                {
+//                    position.x -= xOffset;  //Get new x- position
+//                    position.z -= zOffset;  //Reset z
+//                    //Try again with new x- and old z- position
+//                    try
+//                    {
+//                        updateYPos();
+//                    }catch(ArrayIndexOutOfBoundsException e3) //This doesn't work either
+//                    {
+//                        position.x += xOffset;  //Reset x
+//                    }
+//                }
+//            }
         }
     }
     
@@ -252,6 +262,29 @@ public class FPCameraController
         position.y += distance;
     }
     
+    //Method: fall
+    //Purpose: Use timers, constant acceleration, and velo to move the player in the y direction
+    public void fall(float velo)
+    {
+        curTime = System.currentTimeMillis();   //Get the current time
+        float time = (curTime - startTime) / 1000.0f;   //Get the time in seconds
+        float deltaY = (float)((velo * time) + ((1.0f/2) * ACCELERATION * Math.pow(time, 2)));  //Get the change in y position
+        //Check if the new y position is still above the height of the chunk at the current x- z- position
+        if(position.y - deltaY <= -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))]
+                         * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f))
+        {
+            position.y -= deltaY;   //Update the y position
+        }
+        //Reached the top block of the current stack
+        else
+        {
+            //Set the y poistion to just above the block
+            position.y = -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))]
+                         * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f);
+            falling = false;    //Not falling any more
+        }
+    }
+    
     //Method: lookThrough
     //Purpose: This method performs the transformations so the user is looking 
     //         in the direction the camera is
@@ -269,11 +302,11 @@ public class FPCameraController
     public void gameLoop()
     {
         //Create a chunk
-        Chunk chunk = new Chunk(0, 0, 0);
+        chunk = new Chunk(0, 0, 0);
         int[] pos = chunk.getHighPos(); //Get the coordinates of the highest block in our chunk
         //Our camera starting just above the highest position on our map
         FPCameraController camera = new FPCameraController(-pos[0] * Chunk.CUBE_LENGTH,
-                                                           -pos[1] * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 1),
+                                                           -pos[1] * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f),
                                                            -pos[2] * Chunk.CUBE_LENGTH);
         camera.chunk = chunk;
         float dx = 0.0f;    //Change in the x direction
@@ -282,7 +315,7 @@ public class FPCameraController
         float lastTime = 0.0f;  //The last time that was received
         long time = 0;  //The current time
         float mouseSensitivity = 0.09f; //How quickly the user looks around
-        float movementSpeed = 0.35f;    //How fast the user moves around
+        float movementSpeed = 0.1167f;    //How fast the user moves around
         Mouse.setGrabbed(true); //Hides the mouse so it is in the window
         
         //Continues to show the display until the window is closed or the user 
@@ -325,12 +358,21 @@ public class FPCameraController
                     camera.explore = false; //Turn off explore mode
                     //Set the postion
                     camera.position.x = -pos[0] * Chunk.CUBE_LENGTH;
-                    camera.position.y = -pos[1] * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 1);
+                    camera.position.y = -pos[1] * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f);
                     camera.position.z = -pos[2] * Chunk.CUBE_LENGTH;
                 }
                 else
                     camera.explore = true;  //Turn on explore mode
             }
+            //Makes the user jump if they are not already jumping
+            if(Keyboard.isKeyDown(Keyboard.KEY_J) && !camera.falling)
+            {
+                camera.falling = true;  //Sets falling to true
+                camera.startTime = System.currentTimeMillis();  //Gets the start time of the jump
+            }
+            //Checks if the user is suppose to be falling
+            if(camera.falling)
+                camera.fall(movementSpeed * 3); //Falls/jumps at a speed of 3 times the movement speed
             glLoadIdentity();
             camera.lookThrough();   //Performs the transformations
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
