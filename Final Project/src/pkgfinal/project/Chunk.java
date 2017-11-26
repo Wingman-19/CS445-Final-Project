@@ -155,9 +155,9 @@ public class Chunk {
                 //If the current position is higher than the highest, update the highest
                 if(height > highPos[1])
                 {
-                    //highPos[0] = x;
+                    highPos[0] = x;
                     highPos[1] = (int)height;
-                    //highPos[2] = z;
+                    highPos[2] = z;
                 }
                 heights[x][z] = height; //Add the height to the heights array
             }

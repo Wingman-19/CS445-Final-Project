@@ -291,9 +291,10 @@ public class FPCameraController
         curTime = System.currentTimeMillis();   //Get the current time
         float time = (curTime - startTime) / 1000.0f;   //Get the time in seconds
         float deltaY = (float)((velo * time) + ((1.0f/2) * ACCELERATION * Math.pow(time, 2)));  //Get the change in y position
+        int xPos = (int)(Math.ceil(Math.abs(position.x)) / Chunk.CUBE_LENGTH);
+        int zPos = (int)(Math.ceil(Math.abs(position.z - 1)) / Chunk.CUBE_LENGTH);
         //Check if the new y position is still above the height of the chunk at the current x- z- position
-        if(position.y - deltaY <= -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))]
-                         * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f))
+        if(position.y - deltaY <= (-chunk.getHeights()[xPos][zPos]) * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f))
         {
             position.y -= deltaY;   //Update the y position
         }
@@ -301,8 +302,7 @@ public class FPCameraController
         else
         {
             //Set the y poistion to just above the block
-            position.y = -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))]
-                         * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f);
+            position.y = -(chunk.getHeights()[xPos][zPos]) * Chunk.CUBE_LENGTH - (Chunk.CHUNK_SIZE - 3.5f);
             falling = false;    //Not falling any more
         }
     }
@@ -419,106 +419,12 @@ public class FPCameraController
         if((int)(Math.abs(position.x / Chunk.CUBE_LENGTH)) < Chunk.CHUNK_SIZE - 1 && position.x < 1 &&
            (int)(Math.abs(position.z / Chunk.CUBE_LENGTH)) < Chunk.CHUNK_SIZE - 1 && position.z < 1)
         {
-            position.y = -chunk.getHeights()[(int)(Math.abs(position.x / Chunk.CUBE_LENGTH))][(int)(Math.abs(position.z / Chunk.CUBE_LENGTH))];
-            position.y *= Chunk.CUBE_LENGTH;
-            position.y -= Chunk.CHUNK_SIZE;
+            int xPos = Math.round(Math.abs(position.x / Chunk.CUBE_LENGTH));
+            int zPos = Math.round(Math.abs(position.z / Chunk.CUBE_LENGTH));
+            position.y = -chunk.getHeights()[xPos][zPos] * Chunk.CUBE_LENGTH - Chunk.CHUNK_SIZE;
         }
         //Otherwise throw an error
         else
             throw new ArrayIndexOutOfBoundsException();
     }
-    
-    //Method: render
-    //Purpose: This method is meant to draw the scene which happens to be a 2x2x2
-    //         cude with different color sides right now
-    /*private void render()
-    {
-        try
-        {
-            //Draw the 6 sides with different colors about the origin
-            glBegin(GL_QUADS);
-                //Top
-                glColor3f(1.0f, 0.0f, 0.0f);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-                //Bottom
-                glColor3f(0.5f, 0.5f, 0.0f);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-                //Front
-                glColor3f(0.0f, 1.0f, 0.0f);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-                //Back
-                glColor3f(0.0f, 0.5f, 0.5f);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-                //Left
-                glColor3f(0.0f, 0.0f, 1.0f);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-                //Right
-                glColor3f(0.5f, 0.0f, 0.5f);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-            glEnd();
-            //Draw the outline to each edge of the cube in black
-            glColor3f(0.0f, 0.0f, 0.0f);
-            //Top
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-            glEnd();
-            //Bottom
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-            glEnd();
-            //Front
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-            glEnd();
-            //Back
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-            glEnd();
-            //Left
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(-1.0f, 1.0f, 1.0f);
-                glVertex3f(-1.0f, 1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, -1.0f);
-                glVertex3f(-1.0f, -1.0f, 1.0f);
-            glEnd();
-            //Right
-            glBegin(GL_LINE_LOOP);
-                glVertex3f(1.0f, 1.0f, -1.0f);
-                glVertex3f(1.0f, 1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, 1.0f);
-                glVertex3f(1.0f, -1.0f, -1.0f);
-            glEnd();
-        }catch(Exception e)
-        {}
-    }*/
 }
